@@ -1,3 +1,4 @@
+from httpx import delete
 from opencage.geocoder import OpenCageGeocode
 from tkinter import *
 import webbrowser
@@ -11,16 +12,17 @@ def get_coordinates(city, key):
             lat= round(results[0]['geometry']['lat'], 2)
             lon = round(results[0]['geometry']['lng'], 2)
             country = results [0]["components"]["country"]
+            curr = results[0]["annotations"]["currency"]["name"]
             osm_url = f"https://www.openstreetmap.org/?mlat={lat}&mlon={lon}"
             if "state" in results[0]["components"]:
                 region = results[0]["components"]["state"]
                 return {
-                    "coordinates": f"Широта :{lat}, Долгота :{lon}\n Страна:{country}.\n Регион :{region}",
+                    "coordinates": f"Широта :{lat}, Долгота :{lon}\n Страна:{country}.\n Валюта : {curr}\n Регион :{region}",
                 "map_url": osm_url
                 }
             else:
                 return {
-                    "coordinates": f"Широта :{lat}, Долгота :{lon}\n Страна:{country}.",
+                    "coordinates": f"Широта :{lat}, Долгота :{lon} \n Валюта : {curr}\n Страна:{country}.",
                     "map_url": osm_url
                 }
 
@@ -40,6 +42,10 @@ def show_map():
     if map_url:
         webbrowser.open(map_url)
 
+def clear():
+    entry.delete(0,END)
+    label.config(text="Введите город и нажмите на кнопку")
+
 
 key = 'f5a21611810843969b19dba05d426c44'
 map_url= ""
@@ -55,10 +61,15 @@ entry.bind("<Return>", show_coordinates)
 button = Button(text="Поиск координат", command=show_coordinates)
 button.pack()
 
+label = Label(text="Введите город и нажмите на кнопку")
+label.pack()
+
 map_button = Button(text="Показать карту", command=show_map)
 map_button.pack()
 
-label = Label(text="Введите город и нажмите на кнопку")
-label.pack()
+clear_button = Button(text="Очистить", command=clear)
+clear_button.pack()
+
+
 
 window.mainloop()
